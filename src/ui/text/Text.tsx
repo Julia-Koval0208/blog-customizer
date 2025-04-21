@@ -52,5 +52,3 @@ export const Text = ({
 	);
 	return <Tag className={className}>{children}</Tag>;
 };
-
-export default Text;

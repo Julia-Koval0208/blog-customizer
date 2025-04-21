@@ -46,5 +46,3 @@ export const Option = (props: OptionProps) => {
 		</li>
 	);
 };
-
-export default Option;
