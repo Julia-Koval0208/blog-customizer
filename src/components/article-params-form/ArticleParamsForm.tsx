@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 import Text from '../../ui/text/Text';
@@ -16,19 +16,20 @@ import {
 	defaultArticleState,
 } from 'src/constants/articleProps';
 import { RadioGroup } from 'src/ui/radio-group/RadioGroup';
-import { OnClick } from 'src/ui/arrow-button/ArrowButton';
+import { useOutsideClickClose } from 'src/ui/select/hooks/useOutsideClickClose';
 
 interface PropsParamsForm {
-	toggleOpenForm: OnClick;
-	isOpen: boolean;
 	onChange: (arg: ArticleStateType) => void;
 }
 
-export const ArticleParamsForm = ({
-	toggleOpenForm,
-	isOpen,
-	onChange,
-}: PropsParamsForm) => {
+export const ArticleParamsForm = ({ onChange }: PropsParamsForm) => {
+	const [isMenuOpen, setIsMenuOpen] = useState(false); //здесь хранится состояние формы(открыта или закрыта)
+	const rootRef = useRef<HTMLDivElement>(null);
+
+	const toggleForm = () => {
+		setIsMenuOpen((prev) => !prev);
+	};
+
 	const [articleParams, setArticleParams] = //здесь хранится состояние формы(ее параметров)
 		useState<ArticleStateType>(defaultArticleState);
 
@@ -51,11 +52,20 @@ export const ArticleParamsForm = ({
 		onChange(defaultArticleState);
 	};
 
+	useOutsideClickClose({
+		isOpen: isMenuOpen,
+		rootRef: rootRef,
+		onClose: toggleForm,
+		onChange: setIsMenuOpen,
+	});
+
 	return (
-		<>
-			<ArrowButton onClick={toggleOpenForm} isOpen={isOpen} />
+		<div ref={rootRef}>
+			<ArrowButton onClick={toggleForm} isOpen={isMenuOpen} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, {
+					[styles.container_open]: isMenuOpen,
+				})}>
 				<form className={styles.form} onSubmit={handleSubmit}>
 					<Text
 						as={'h3'}
@@ -107,6 +117,6 @@ export const ArticleParamsForm = ({
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
